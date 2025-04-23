@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using Service;
 
 namespace Controller
@@ -6,42 +6,55 @@ namespace Controller
     public class PagamentoController
     {
         private readonly PagamentoService _service = new();
-        private readonly int usuarioId = 1; // SimulaÁ„o
+        private readonly int _usuarioId;
+
+        public PagamentoController(int usuarioId)
+        {
+            _usuarioId = usuarioId;
+        }
 
         public void ProcessarCartao()
         {
-            Console.Write("Informe o n˙mero do cart„o: ");
+            Console.Write("Informe o n√∫mero do cart√£o: ");
             string numero = Console.ReadLine();
 
             Console.Write("Informe o valor do pagamento: ");
             if (!decimal.TryParse(Console.ReadLine(), out decimal valor))
             {
-                Console.WriteLine("Valor inv·lido.");
+                Console.WriteLine("Valor inv√°lido.");
                 return;
             }
 
             string idTransacao = _service.SimularTransacao("cartao");
-            _service.SalvarPagamento("Cart„o", valor, "concluÌdo", numero, usuarioId);
 
-            Console.WriteLine($"Pagamento processado com cart„o. ID TransaÁ„o: {idTransacao}");
+            _service.SalvarPagamento("Cart√£o", valor, "conclu√≠do", numero, _usuarioId);
+
+            Console.WriteLine($"Pagamento CONCLU√çDO com cart√£o. ID Transa√ß√£o: {idTransacao}");
         }
+
 
         public void ProcessarBoleto()
         {
-            Console.Write("Informe o cÛdigo de barras: ");
+            Console.Write("Informe o c√≥digo de barras: ");
             string codigo = Console.ReadLine();
 
             Console.Write("Informe o valor do pagamento: ");
             if (!decimal.TryParse(Console.ReadLine(), out decimal valor))
             {
-                Console.WriteLine("Valor inv·lido.");
+                Console.WriteLine("Valor inv√°lido.");
                 return;
             }
 
             string idTransacao = _service.SimularTransacao("boleto");
-            _service.SalvarPagamento("Boleto", valor, "concluÌdo", codigo, usuarioId);
 
-            Console.WriteLine($"Pagamento processado com boleto. ID TransaÁ„o: {idTransacao}");
+            _service.SalvarPagamento("Boleto", valor, "pendente", codigo, _usuarioId);
+
+            Console.WriteLine($"Pagamento registrado como PENDENTE com boleto. ID Transa√ß√£o: {idTransacao}");
+        }
+
+        public void VerPagamentos()
+        {
+            _service.ListarPagamentosDoUsuario(_usuarioId);
         }
     }
 }

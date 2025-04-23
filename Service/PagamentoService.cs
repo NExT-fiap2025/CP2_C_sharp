@@ -8,7 +8,7 @@ namespace Service
     {
         public string SimularTransacao(string tipo)
         {
-            return tipo.ToUpper()[0] + Guid.NewGuid().ToString("N")[..8].ToUpper(); // Ex: C6A1F8A2
+            return tipo.ToUpper()[0] + Guid.NewGuid().ToString("N")[..8].ToUpper();
         }
 
         public void SalvarPagamento(string tipo, decimal valor, string status, string dados, int usuarioId)
@@ -30,6 +30,75 @@ namespace Service
             cmd.Parameters.AddWithValue("$usuarioId", usuarioId);
 
             cmd.ExecuteNonQuery();
+        }
+
+        public void ListarPagamentosDoUsuario(int usuarioId)
+        {
+            using var connection = DbService.ObterConexao();
+            connection.Open();
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                SELECT id, tipo, valor, status, dados, data
+                FROM pagamentos
+                WHERE usuario_id = $usuarioId
+                ORDER BY data DESC;
+            ";
+
+            cmd.Parameters.AddWithValue("$usuarioId", usuarioId);
+
+            using var reader = cmd.ExecuteReader();
+            Console.WriteLine("\n--- Pagamentos Realizados ---");
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                string tipo = reader.GetString(1);
+                decimal valor = reader.GetDecimal(2);
+                string status = reader.GetString(3);
+                string dados = reader.GetString(4);
+                string data = reader.GetString(5);
+
+                Console.WriteLine($"[{id}] {tipo} | R$ {valor:F2} | {status} | Dados: {dados} | Data: {data}");
+            }
+            Console.WriteLine("------------------------------\n");
+        }
+
+        public void ListarPagamentosPendentes(int usuarioId)
+        {
+            using var connection = DbService.ObterConexao();
+            connection.Open();
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                SELECT id, tipo, valor, dados, data
+                FROM pagamentos
+                WHERE usuario_id = $usuarioId AND status = 'pendente'
+                ORDER BY data DESC;
+            ";
+
+            cmd.Parameters.AddWithValue("$usuarioId", usuarioId);
+
+            using var reader = cmd.ExecuteReader();
+            bool temResultados = false;
+            Console.WriteLine("\n--- Pagamentos Pendentes ---");
+            while (reader.Read())
+            {
+                temResultados = true;
+                int id = reader.GetInt32(0);
+                string tipo = reader.GetString(1);
+                decimal valor = reader.GetDecimal(2);
+                string dados = reader.GetString(3);
+                string data = reader.GetString(4);
+
+                Console.WriteLine($"[{id}] {tipo} | R$ {valor:F2} | Dados: {dados} | Data: {data}");
+            }
+
+            if (!temResultados)
+            {
+                Console.WriteLine("Nenhum pagamento pendente. Obrigado!");
+            }
+
+            Console.WriteLine("-----------------------------\n");
         }
     }
 }

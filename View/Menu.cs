@@ -8,8 +8,10 @@ namespace View
             Console.WriteLine("********** Escolha a forma de pagamento **********");
             Console.WriteLine("1 - Cartão");
             Console.WriteLine("2 - Boleto");
-            Console.WriteLine("3 - Sair");
+            Console.WriteLine("3 - Ver pagamentos");
+            Console.WriteLine("4 - Sair");
             Console.Write("Escolha uma opção: ");
         }
+
     }
 }

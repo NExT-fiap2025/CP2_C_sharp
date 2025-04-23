@@ -15,8 +15,7 @@ namespace Db
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS usuarios (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome TEXT NOT NULL,
-                    email TEXT NOT NULL
+                    nome TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS pagamentos (
